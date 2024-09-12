@@ -1,0 +1,11 @@
+
+
+>docker exec -it sql_ex_postgres_1   sh
+
+# pg_dump -s -h localhost -p 5432  -U username test01 > /var/dump/test01.dmp
+
+
+
+>docker exec sql_ex_postgres_1 /bin/sh -c  "pg_dump -s -h localhost -p 5432  -U usern
+ame test01 > /var/dump/test01.dmp"
+

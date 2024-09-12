@@ -1,0 +1,9 @@
+https://zenn.dev/aidemy/articles/relations-to-sql
+
+psql -h localhost -p 5432 -U username -c "create database test02;"
+psql -h localhost -p 5432 -U username -d test02 -f ./test02.sql
+
+psql -h 127.0.0.1 -p 5432 -U username -d test02 -c "\d"
+
+psql -h localhost -p 5432 -U username -d test02 -c "select * from users where false;"
+psql -h localhost -p 5432 -U username -d test02 -c "select * from users ;"

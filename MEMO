@@ -1,0 +1,46 @@
+
+
+docker-compose up -d postgres
+
+touch ~/.pgpass
+chmod 600  ~/.pgpass
+
+echo localhost:5432:*:username:password >  ~/.pgpass
+echo 127.0.0.1:5432:*:username:password >>  ~/.pgpass
+
+
+||psql -h 127.0.0.1 -p 5432 -U username
+||# create database test01;
+
+psql -h 127.0.0.1 -p 5432 -U username -c "\l"
+psql -h 127.0.0.1 -p 5432 -U username -c "create database test01;"
+psql -h 127.0.0.1 -p 5432 -U username -c "create database test02;"
+psql -h 127.0.0.1 -p 5432 -U username -c "create database test03;"
+psql -h 127.0.0.1 -p 5432 -U username -d test01 -c "\d"
+psql -h localhost -p 5432 -U username -d test01 -c "\d"
+
+psql -h localhost -p 5432 -U username -d test01 -f ./_step1.sql
+
+$ psql -h localhost -p 5432 -U username -d test01 -c "\d"
+
+** dump **
+
+--schema-only
+pg_dump -s -h 127.0.0.1 -p 5432  -U username test01 > _schema-only.dmp
+
+--data-only
+pg_dump -a -h 127.0.0.1 -p 5432  -U usernane test01 > _data-only.dmp
+
+-- full
+pg_dump -h 127.0.0.1 -p 5432  -U username test01 > _full.dmp
+~
+
+####  python
+
+>python3 --version
+Python 3.8.10
+
+pip3 install psycopg2-binary
+
+
+
