@@ -1,0 +1,13 @@
+https://www.issoh.co.jp/column/details/2859/
+
+psql -h localhost -p 5432 -U username -c "create database test01;"
+psql -h localhost -p 5432 -U username -d test01 -f ./test01.sql
+
+psql -h 127.0.0.1 -p 5432 -U username -d test01 -c "\d"
+
+psql -h localhost -p 5432 -U username -d test01 -c "select * from users where false;"
+psql -h localhost -p 5432 -U username -d test01 -c "select * from users ;"
+
+_dbname_ ファイル導入
+_dbname_ file introduction
+

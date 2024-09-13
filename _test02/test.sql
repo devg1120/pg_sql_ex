@@ -4,13 +4,6 @@ CREATE TABLE users (
     email VARCHAR(100) NOT NULL
 );
  
-CREATE TABLE user_cards (
-    id INT PRIMARY KEY,
-    user_id INT,
-    card_number VARCHAR(50) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-);
-
 CREATE TABLE posts (
     id INT PRIMARY KEY,
     user_id INT,
