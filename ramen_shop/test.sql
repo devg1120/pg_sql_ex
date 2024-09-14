@@ -5,10 +5,24 @@ CREATE TABLE RAMEN (
     name   VARCHAR(50) NOT NULL
 );
 
+CREATE TABLE RAMEN_PRICE (
+    ramen_id INT PRIMARY KEY,
+    price  INT,
+    FOREIGN KEY (ramen_id) REFERENCES RAMEN(ramen_id)
+);
+
 --トッピング
 CREATE TABLE TOPPING (
     topping_id INT PRIMARY KEY,
-    name   VARCHAR(50) NOT NULL
+    name   VARCHAR(50) NOT NULL,
+    size   VARCHAR(50),
+    country  VARCHAR(50)
+);
+
+CREATE TABLE TOPPING_PRICE (
+    topping_id INT PRIMARY KEY,
+    price  INT,
+    FOREIGN KEY (topping_id) REFERENCES TOPPING(topping_id)
 );
 
 --麺の種類

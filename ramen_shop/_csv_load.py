@@ -112,7 +112,7 @@ def line_insert(cursor,table_name, sql, column_type_list, line):
 def all_dump(cursor, table_name):
        cursor.execute(f"SELECT * FROM {table_name}")
        query_result = cursor.fetchall()
-       print(query_result)
+       print(f"{table_name:16}  {query_result}")
 
 def csv_load(cursor, table_name, csv_filepath):
        print("***csv_load")
@@ -143,6 +143,63 @@ def csv_load(cursor, table_name, csv_filepath):
              else:
                  line_insert(cursor, table_name, sql, column_type_list, m.group(1))
              
+def insert(cursor, table_name, data):
+       column_type_list = table_column_list(cursor, table_name)
+       column_name_list = ""
+       print_fmt = ""
+       for entry  in column_type_list:
+           print(entry [1])
+           column_name_list +=  entry [1] + ","
+           print_fmt += "%s,"
+
+       column_name_list = column_name_list.rstrip(",")
+       print_fmt = print_fmt.rstrip(",")
+
+       #   sql = "INSERT INTO users (id, username, email) VALUES (%s, %s, %s)"
+       sql = f"INSERT INTO {table_name} ( {column_name_list} ) VALUES ({print_fmt})"
+       line_insert(cursor, table_name, sql, column_type_list, data)
+
+#def update(cursor, table_name, column_name_list,print_fmt ,where, data):
+def test_update_(cursor):
+       table_name = "topping"
+       column_name = "name"
+       fmt = "%s"
+       where = "topping_id"
+       sql = f"UPDATE {table_name} set  {column_name}  = {fmt} WHERE {where} = %s"
+       cursor.execute(sql, ('AAAA',5))
+
+def test_update_multi_(cursor):
+       table_name = "topping"
+       column_name = "(name, size)"
+       fmt = "(%s, %s)"
+       where = "topping_id"
+       sql = f"UPDATE {table_name} set  {column_name}  = {fmt} WHERE {where} = %s"
+       cursor.execute(sql, ('おかか','L', 4))
+
+def test_update(cursor):
+       table_name = "topping"
+       column_name = "name"
+       fmt = "%s"
+       where = "topping_id = 5"
+       sql = f"UPDATE {table_name} set  {column_name}  = {fmt} WHERE {where} "
+       cursor.execute(sql, ('AAAA',))
+
+def test_update_multi(cursor):
+       table_name = "topping"
+       column_name = "(name, size)"
+       fmt = "(%s, %s)"
+       where = "topping_id = 4"
+       sql = f"UPDATE {table_name} set  {column_name}  = {fmt} WHERE {where} "
+       cursor.execute(sql, ('おかか','L'))
+
+def update(cursor, table_name, where, column_name, fmt, data_tuple):
+       #table_name = "topping"
+       #column_name = "(name, size)"
+       #fmt = "(%s, %s)"
+       #where = "topping_id = 4"
+       sql = f"UPDATE {table_name} set  {column_name}  = {fmt} WHERE {where} "
+       cursor.execute(sql, data_tuple)
+
 def get_dbinfo():
        host = "localhost"
        dbname = ""
@@ -169,6 +226,35 @@ def get_dbinfo():
                  dbname = param[1]
        return (host, dbname, username, password )
 
+
+#* ramen
+#* topping
+#* type_of_noodle           
+#* noodle_hardness          
+#* soup_thickness           
+#* amount_of_oil            
+#* sex                      
+
+
+# customer                 
+# customer_customer_id_seq 
+# order_list               
+# order_list_order_id_seq  
+# order_topping            
+
+table_list = [
+"ramen",
+"ramen_price",
+"topping",
+"topping_price",
+"type_of_noodle",
+"noodle_hardness",
+"soup_thickness",
+"amount_of_oil",
+"sex"
+]
+
+
 def main():
     try:
        (host, dbname, username, password) = get_dbinfo()
@@ -177,11 +263,56 @@ def main():
        cursor = connection.cursor()
 
        #all_delete(cursor)
-       delete(cursor, "ramen")
        #insert(cursor)
-       csv_load(cursor, "ramen",      "./data/ramen.csv")
-       all_dump(cursor, "ramen")
+
+       #delete(cursor, "ramen")
+       #delete(cursor, "topping")
+       #csv_load(cursor, "ramen",      "./data/ramen.csv")
+       #csv_load(cursor, "topping",      "./data/topping.csv")
+       #all_dump(cursor, "ramen")
+       #all_dump(cursor, "topping")
+
+       for table in reversed(table_list):
+           delete(cursor, table)
+
+       for table in table_list:
+           print(table)
+           csv_load(cursor, table,   f"./data/{table}.csv")
        
+       insert(cursor, "topping",   "5,ねぎ,S,JP")
+       insert(cursor, "topping_price",   "5,10")
+
+       for table in table_list:
+           all_dump(cursor, table)
+
+       #all_dump(cursor, "topping")
+       #test_update(cursor)
+       #all_dump(cursor, "topping")
+       #test_update_multi(cursor)
+       #all_dump(cursor, "topping")
+
+       all_dump(cursor, "topping")
+
+       table_name = "topping"
+       where = "topping_id = 5"
+       column_name = "name"
+       fmt = "%s"
+       data_tuple = ('AAAA',)
+       update(cursor, table_name, where, column_name, fmt, data_tuple)
+
+       all_dump(cursor, "topping")
+
+       table_name = "topping"
+       where = "topping_id = 4"
+       column_name = "(name, size)"
+       fmt = "(%s, %s)"
+       data_tuple = ('おかか','L')
+       update(cursor, table_name, where, column_name, fmt, data_tuple)
+
+       all_dump(cursor, "topping")
+
+
+
        cursor.close()
        connection.commit()
 
