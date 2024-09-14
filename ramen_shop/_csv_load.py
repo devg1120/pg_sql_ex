@@ -267,7 +267,8 @@ table_list = [
 "noodle_hardness",
 "soup_thickness",
 "amount_of_oil",
-"sex"
+"sex",
+"customer"
 ]
 
 
@@ -278,6 +279,8 @@ def main():
        connection = get_connect(host, dbname, username, password )
        cursor = connection.cursor()
 
+       cursor.execute(f"DELETE FROM order_topping;")
+       cursor.execute(f"DELETE FROM order_list;")
        #all_delete(cursor)
        #insert(cursor)
 
@@ -330,6 +333,11 @@ def main():
 
        all_dump(cursor, "topping")
 
+       insert(cursor, "order_list",   (20240911001,3,1,2000,"2024-01-08 04:05:06"))
+       insert(cursor, "order_topping",   (20240911001,1))
+       insert(cursor, "order_topping",   (20240911001,3))
+       all_dump(cursor, "order_list")
+       all_dump(cursor, "order_topping")
 
 
        cursor.close()

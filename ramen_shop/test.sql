@@ -68,18 +68,19 @@ CREATE TABLE CUSTOMER  (
 
 --注文
 CREATE TABLE ORDER_LIST (
-    order_id SERIAL PRIMARY KEY ,
+    order_id BIGSERIAL PRIMARY KEY ,  -- YYYYMMDD$$$
     customer_id INT,
     ramen_id INT,
     fee INT,
-    day TIME,
+    --day TIME,
+    day TIMESTAMP,
     FOREIGN KEY (customer_id) REFERENCES CUSTOMER(customer_id),
     FOREIGN KEY (ramen_id)    REFERENCES RAMEN(ramen_id)
 );
 
 --注文 トッピング
 CREATE TABLE ORDER_TOPPING (
-    order_id INT ,
+    order_id BIGSERIAL ,
     topping_id INT,
     FOREIGN KEY (order_id) REFERENCES ORDER_LIST(order_id),
     FOREIGN KEY (topping_id) REFERENCES TOPPING(topping_id)
