@@ -143,7 +143,7 @@ def csv_load(cursor, table_name, csv_filepath):
              else:
                  line_insert(cursor, table_name, sql, column_type_list, m.group(1))
              
-def insert(cursor, table_name, data):
+def insert_text(cursor, table_name, data):
        column_type_list = table_column_list(cursor, table_name)
        column_name_list = ""
        print_fmt = ""
@@ -158,6 +158,22 @@ def insert(cursor, table_name, data):
        #   sql = "INSERT INTO users (id, username, email) VALUES (%s, %s, %s)"
        sql = f"INSERT INTO {table_name} ( {column_name_list} ) VALUES ({print_fmt})"
        line_insert(cursor, table_name, sql, column_type_list, data)
+
+def insert(cursor, table_name, data_tuple):
+       column_type_list = table_column_list(cursor, table_name)
+       column_name_list = ""
+       print_fmt = ""
+       for entry  in column_type_list:
+           print(entry [1])
+           column_name_list +=  entry [1] + ","
+           print_fmt += "%s,"
+
+       column_name_list = column_name_list.rstrip(",")
+       print_fmt = print_fmt.rstrip(",")
+
+       #   sql = "INSERT INTO users (id, username, email) VALUES (%s, %s, %s)"
+       sql = f"INSERT INTO {table_name} ( {column_name_list} ) VALUES ({print_fmt})"
+       cursor.execute(sql, data_tuple)
 
 #def update(cursor, table_name, column_name_list,print_fmt ,where, data):
 def test_update_(cursor):
@@ -279,8 +295,11 @@ def main():
            print(table)
            csv_load(cursor, table,   f"./data/{table}.csv")
        
-       insert(cursor, "topping",   "5,ねぎ,S,JP")
-       insert(cursor, "topping_price",   "5,10")
+       #insert_text(cursor, "topping",   "5,ねぎ,S,JP")
+       #insert_text(cursor, "topping_price",   "5,10")
+
+       insert(cursor, "topping",   (5,'ねぎ','S','JP'))
+       insert(cursor, "topping_price",   (5,10))
 
        for table in table_list:
            all_dump(cursor, table)
