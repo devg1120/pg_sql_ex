@@ -13,8 +13,7 @@ CREATE TABLE RAMEN_PRICE (
 
 --トッピング
 CREATE TABLE TOPPING (
-    --topping_id INT PRIMARY KEY,
-    topping_id SERIAL PRIMARY KEY,
+    topping_id INT PRIMARY KEY,
     name   VARCHAR(50) NOT NULL,
     size   VARCHAR(50),
     country  VARCHAR(50)
@@ -87,17 +86,4 @@ CREATE TABLE ORDER_TOPPING (
     topping_id INT,
     FOREIGN KEY (order_id) REFERENCES ORDER_LIST(order_id),
     FOREIGN KEY (topping_id) REFERENCES TOPPING(topping_id)
-);
-
-
-CREATE SEQUENCE test_sequence
-  start 100
-  increment 1;
-
---
-CREATE TABLE SQ_TEST (
-    --id INT PRIMARY KEY,
-    id SERIAL PRIMARY KEY,
-    name   VARCHAR(50) NOT NULL,
-    value INT
 );

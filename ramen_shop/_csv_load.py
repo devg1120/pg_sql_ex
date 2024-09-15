@@ -85,7 +85,8 @@ def table_column_list(cursor, table_name):
                t.table_name,\
                c.column_name,\
                c.is_nullable,\
-               c.data_type\
+               c.data_type,\
+               c.ordinal_position\
              FROM\
                (SELECT * FROM information_schema.tables\
                 WHERE table_schema = 'public' AND table_type = 'BASE TABLE' AND table_name = '{TABLE}') t\
@@ -126,7 +127,9 @@ def line_insert(cursor,table_name, sql, column_type_list, line):
 def all_dump(cursor, table_name):
        cursor.execute(f"SELECT * FROM {table_name}")
        query_result = cursor.fetchall()
-       print(f"{table_name:16}  {query_result}")
+       #print(f"{table_name:16}  {query_result}")
+       for entry in query_result:
+           print(entry)
 
 def csv_load(cursor, table_name, csv_filepath):
        print("***csv_load")
@@ -157,6 +160,72 @@ def csv_load(cursor, table_name, csv_filepath):
              else:
                  line_insert(cursor, table_name, sql, column_type_list, m.group(1))
              
+def sq_csv_load(cursor, table_name, csv_filepath):
+       print("***sq_csv_load")
+       column_type_list = table_column_list(cursor, table_name)
+       column_name_list = ""
+       print_fmt = ""
+       for entry  in column_type_list:
+           print(entry)
+           #if entry[1] == 'id':
+           #    continue
+           column_name_list +=  entry [1] + ","
+           print_fmt += "%s,"
+
+       print_fmt = "%s,%s"
+
+       column_name_list = column_name_list.rstrip(",")
+       print_fmt = print_fmt.rstrip(",")
+
+       #   sql = "INSERT INTO users (id, username, email) VALUES (%s, %s, %s)"
+       sql = f"INSERT INTO {table_name} ( {column_name_list} ) VALUES (nextval('test_sequence'), {print_fmt})"
+       print(sql)
+       with open(csv_filepath) as f:
+          for line in f:
+             line2 =  line.rstrip()
+             if line2 == "":
+                 continue
+             if line2.startswith('#'):
+                 continue
+             m = re.match('(.+ )\#(.+)$',line2)
+             if m == None:
+                 line_insert(cursor, table_name, sql, column_type_list[1:], line2)
+             else:
+                 line_insert(cursor, table_name, sql, column_type_list[1:], m.group(1))
+
+def sq_csv_load2(cursor, table_name, serial_index, csv_filepath):
+       print("***sq_csv_load serial index")
+       column_type_list = table_column_list(cursor, table_name)
+       column_name_list = ""
+       print_fmt = ""
+       for entry  in column_type_list:
+           print(entry)
+           #if entry[1] == 'id':
+           #    continue
+           column_name_list +=  entry [1] + ","
+           print_fmt += "%s,"
+
+       print_fmt = "%s,%s"
+
+       column_name_list = column_name_list.rstrip(",")
+       print_fmt = print_fmt.rstrip(",")
+
+       #   sql = "INSERT INTO users (id, username, email) VALUES (%s, %s, %s)"
+       sql = f"INSERT INTO {table_name} ( {column_name_list} ) VALUES (nextval('test_sequence'), {print_fmt})"
+       print(sql)
+       with open(csv_filepath) as f:
+          for line in f:
+             line2 =  line.rstrip()
+             if line2 == "":
+                 continue
+             if line2.startswith('#'):
+                 continue
+             m = re.match('(.+ )\#(.+)$',line2)
+             if m == None:
+                 line_insert(cursor, table_name, sql, column_type_list[1:], line2)
+             else:
+                 line_insert(cursor, table_name, sql, column_type_list[1:], m.group(1))
+
 def insert_text(cursor, table_name, data):
        column_type_list = table_column_list(cursor, table_name)
        column_name_list = ""
@@ -355,6 +424,9 @@ def main():
        insert(cursor, "order_list",   (20240911001,str(uuid_),str(ulid_),3,1,2000,"2024-01-08 04:05:06"))
        insert(cursor, "order_topping",   (20240911001,1))
        insert(cursor, "order_topping",   (20240911001,3))
+       insert(cursor, "order_list",   (20240911002,str(uuid_),str(ulid_),2,3,1000,"2024-01-09 04:05:06"))
+       insert(cursor, "order_topping",   (20240911002,1))
+
        all_dump(cursor, "order_list")
        all_dump(cursor, "order_topping")
 
@@ -389,6 +461,12 @@ def main():
        print("__",ulid_bytes.timestamp)
        print("__",datetime.datetime.fromtimestamp(ulid_bytes.timestamp))
 
+       insert(cursor, "topping",   (7,'ちくわ','S','JP'))
+       insert(cursor, "topping_price",   (7,5))
+       all_dump(cursor, "topping")
+
+       sq_csv_load(cursor, "sq_test" ,   f"./data/sq_test.csv")
+       all_dump(cursor, "sq_test")
 
        cursor.close()
        connection.commit()
