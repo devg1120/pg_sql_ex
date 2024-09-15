@@ -1,7 +1,11 @@
 import sys
 import traceback
 import re
-
+from uuid6 import uuid7
+import uuid
+from ulid import ULID
+import time
+import datetime
 import psycopg2
 from psycopg2.extensions import connection
 
@@ -10,6 +14,16 @@ from psycopg2.extensions import connection
 
 #print(psycopg2.apilevel)
 
+def extract_timestamp_from_uuid7(uuid):
+    uuid_bytes = uuid.bytes
+    # タイムスタンプ部分を抽出
+    timestamp_ms = int.from_bytes(uuid_bytes[:6], byteorder = "big")
+    # タイムスタンプをミリ秒単位のUnixタイムスタンプとして解釈
+    #timestamp_s = timestamp_ms / 1000.0
+    timestamp_s = timestamp_ms / 1000
+    # タイムスタンプをdatetimeオブジェクトに変換
+    dt = datetime.datetime.fromtimestamp(timestamp_s)
+    return dt
 
 def get_connect( hostname, dbname,username, password) -> connection:
     target = f"host={hostname} dbname={dbname} user={username} password={password}"
@@ -333,11 +347,45 @@ def main():
 
        all_dump(cursor, "topping")
 
-       insert(cursor, "order_list",   (20240911001,3,1,2000,"2024-01-08 04:05:06"))
+       uuid_ = uuid7()
+
+       time.sleep(1)  
+       ulid_ = ULID()
+
+       insert(cursor, "order_list",   (20240911001,str(uuid_),str(ulid_),3,1,2000,"2024-01-08 04:05:06"))
        insert(cursor, "order_topping",   (20240911001,1))
        insert(cursor, "order_topping",   (20240911001,3))
        all_dump(cursor, "order_list")
        all_dump(cursor, "order_topping")
+
+       #https://zenn.dev/kazu1/articles/e8a668d1d27d6b
+       #https://pypi.org/project/python-ulid/
+
+       # --- 48 ---   -- 4 --   - 12 -   -- 2 --   - 62 -
+       # unix_ts_ms | version | rand_a | variant | rand_b
+
+       print(str(uuid_))
+       print("**",extract_timestamp_from_uuid7(uuid_))
+
+       str_uuid = str(uuid_)
+       uuid_bytes = uuid.UUID(str_uuid)
+       print("**",extract_timestamp_from_uuid7(uuid_bytes))
+
+       # https://pypi.org/project/python-ulid/
+       # 
+       # 01AN4Z07BY      79KA1307SR9X4MV3
+       #|----------|    |----------------|
+       # Timestamp          Randomness
+       #   48bits             80bits
+
+       print(ulid_)
+       print("**",extract_timestamp_from_uuid7(ulid_))
+       print("__",ulid_.datetime)
+       
+       str_ulid = str(ulid_)
+       ulid_bytes = ULID.from_str(str_ulid)
+       print("**",extract_timestamp_from_uuid7(ulid_bytes))
+       print("__",ulid_bytes.datetime)
 
 
        cursor.close()

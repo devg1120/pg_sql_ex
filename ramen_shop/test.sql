@@ -69,6 +69,8 @@ CREATE TABLE CUSTOMER  (
 --注文
 CREATE TABLE ORDER_LIST (
     order_id BIGSERIAL PRIMARY KEY ,  -- YYYYMMDD$$$
+    uuid    UUID,
+    ulid    TEXT,
     customer_id INT,
     ramen_id INT,
     fee INT,
