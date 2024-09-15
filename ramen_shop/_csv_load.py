@@ -386,6 +386,8 @@ def main():
        ulid_bytes = ULID.from_str(str_ulid)
        print("**",extract_timestamp_from_uuid7(ulid_bytes))
        print("__",ulid_bytes.datetime)
+       print("__",ulid_bytes.timestamp)
+       print("__",datetime.datetime.fromtimestamp(ulid_bytes.timestamp))
 
 
        cursor.close()
