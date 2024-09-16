@@ -193,26 +193,25 @@ def sq_csv_load(cursor, table_name, csv_filepath):
              else:
                  line_insert(cursor, table_name, sql, column_type_list[1:], m.group(1))
 
-def sq_csv_load2(cursor, table_name, seq_index, seq_name, csv_filepath):
+def sq_csv_load2(cursor, table_name, serial_index, csv_filepath):
        print("***sq_csv_load serial index")
        column_type_list = table_column_list(cursor, table_name)
        column_name_list = ""
        print_fmt = ""
        for entry  in column_type_list:
            print(entry)
-           if entry[4] == seq_index:
-              #print_fmt += "nextval('test_sequence'), "
-              print_fmt += f"nextval('{seq_name}'), "
-           else:
-              print_fmt += "%s,"
+           #if entry[1] == 'id':
+           #    continue
            column_name_list +=  entry [1] + ","
+           print_fmt += "%s,"
 
+       print_fmt = "%s,%s"
 
        column_name_list = column_name_list.rstrip(",")
        print_fmt = print_fmt.rstrip(",")
 
        #   sql = "INSERT INTO users (id, username, email) VALUES (%s, %s, %s)"
-       sql = f"INSERT INTO {table_name} ( {column_name_list} ) VALUES ({print_fmt})"
+       sql = f"INSERT INTO {table_name} ( {column_name_list} ) VALUES (nextval('test_sequence'), {print_fmt})"
        print(sql)
        with open(csv_filepath) as f:
           for line in f:
@@ -466,8 +465,7 @@ def main():
        insert(cursor, "topping_price",   (7,5))
        all_dump(cursor, "topping")
 
-       #sq_csv_load(cursor, "sq_test" ,   f"./data/sq_test.csv")
-       sq_csv_load2(cursor, "sq_test" , 1,  "test_sequence",  "./data/sq_test.csv")
+       sq_csv_load(cursor, "sq_test" ,   f"./data/sq_test.csv")
        all_dump(cursor, "sq_test")
 
        cursor.close()
